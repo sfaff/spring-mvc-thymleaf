@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout.html}">
+<head>
+    <title>Content page</title>
+    <script src="content-script.js"></script>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <h1>Welcome, User</span>!</h1>
+        <p>You are logged in.</p>
+        <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+    </div>
+</section>
+</body>
+</html>

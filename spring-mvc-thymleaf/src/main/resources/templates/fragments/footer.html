@@ -1,0 +1,8 @@
+<!-- Footer Fragment -->
+<div th:fragment="footer" xmlns:th="http://www.w3.org/1999/xhtml">
+    <footer class="footer">
+        <div class="container">
+            <span class="text-muted">© <span th:text="${T(java.time.LocalDate).now().year}"></span> MyApp, Inc.</span>
+        </div>
+    </footer>
+</div>
