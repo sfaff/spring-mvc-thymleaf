@@ -1,429 +1,236 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
-import { Button } from "primereact/button";
-import { Divider } from "primereact/divider";
-import "primereact/resources/themes/lara-light-blue/theme.css";
-import "primereact/resources/primereact.min.css";
-import "primeicons/primeicons.css";
-import "primeflex/primeflex.css";
-import "./MegaMenu.css";
+/* Custom Mega Menu Styles */
 
-// Type Definitions
-interface MenuItem {
-  label: string;
-  icon: string;
+.custom-megamenu {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
 }
 
-interface MenuCategory {
-  category: string;
-  items: MenuItem[];
+.desktop-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-interface MenuData {
-  label: string;
-  icon: string;
-  items: MenuCategory[];
+.menu-container {
+  position: relative;
 }
 
-// Constants
-const HOVER_DELAY_MS = 100;
-const NAV_HEIGHT = "60px";
-
-const MENU_DATA: readonly MenuData[] = [
-  {
-    label: "Furniture",
-    icon: "pi pi-box",
-    items: [
-      {
-        category: "Living Room",
-        items: [
-          { label: "Accessories", icon: "pi pi-star" },
-          { label: "Armchair", icon: "pi pi-star" },
-          { label: "Coffee Table", icon: "pi pi-star" },
-          { label: "Sofa", icon: "pi pi-star" },
-        ],
-      },
-      {
-        category: "Kitchen",
-        items: [
-          { label: "Bar Stool", icon: "pi pi-star" },
-          { label: "Chair", icon: "pi pi-star" },
-          { label: "Table", icon: "pi pi-star" },
-          { label: "Cabinet", icon: "pi pi-star" },
-        ],
-      },
-      {
-        category: "Bedroom",
-        items: [
-          { label: "Bed", icon: "pi pi-star" },
-          { label: "Dresser", icon: "pi pi-star" },
-          { label: "Nightstand", icon: "pi pi-star" },
-          { label: "Wardrobe", icon: "pi pi-star" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Electronics",
-    icon: "pi pi-mobile",
-    items: [
-      {
-        category: "Computer",
-        items: [
-          { label: "Monitor", icon: "pi pi-desktop" },
-          { label: "Mouse", icon: "pi pi-desktop" },
-          { label: "Keyboard", icon: "pi pi-desktop" },
-          { label: "Laptop", icon: "pi pi-desktop" },
-        ],
-      },
-      {
-        category: "Mobile",
-        items: [
-          { label: "Phone", icon: "pi pi-mobile" },
-          { label: "Tablet", icon: "pi pi-mobile" },
-          { label: "Smartwatch", icon: "pi pi-mobile" },
-        ],
-      },
-      {
-        category: "Audio",
-        items: [
-          { label: "Headphones", icon: "pi pi-volume-up" },
-          { label: "Speakers", icon: "pi pi-volume-up" },
-          { label: "Microphone", icon: "pi pi-volume-up" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Clothing",
-    icon: "pi pi-shopping-bag",
-    items: [
-      {
-        category: "Men",
-        items: [
-          { label: "Shirts", icon: "pi pi-user" },
-          { label: "Pants", icon: "pi pi-user" },
-          { label: "Shoes", icon: "pi pi-user" },
-          { label: "Accessories", icon: "pi pi-user" },
-        ],
-      },
-      {
-        category: "Women",
-        items: [
-          { label: "Dresses", icon: "pi pi-user" },
-          { label: "Tops", icon: "pi pi-user" },
-          { label: "Shoes", icon: "pi pi-user" },
-          { label: "Bags", icon: "pi pi-user" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Sports",
-    icon: "pi pi-flag",
-    items: [
-      {
-        category: "",
-        items: [],
-      },
-      {
-        category: "Outdoor",
-        items: [
-          { label: "Camping", icon: "pi pi-sun" },
-          { label: "Hiking", icon: "pi pi-sun" },
-          { label: "Cycling", icon: "pi pi-sun" },
-        ],
-      },
-      {
-        category: "Indoor",
-        items: [
-          { label: "Gym Equipment", icon: "pi pi-heart" },
-          { label: "Yoga", icon: "pi pi-heart" },
-          { label: "Weights", icon: "pi pi-heart" },
-        ],
-      },
-    ],
-  },
-] as const;
-
-// Component Props
-interface MenuLinkProps {
-  item: MenuItem;
-  onHover: (label: string) => void;
-  onLeave: () => void;
-  onClick: (label: string) => void;
+.menu-item {
+  position: relative;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
 }
 
-interface MegaMenuPanelProps {
-  menu: MenuData;
-  isActive: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  hoveredItem: string | null;
-  onItemHover: (label: string) => void;
-  onItemLeave: () => void;
+.menu-item:hover {
+  background: #f8f9fa;
+  border-bottom-color: #3b82f6;
 }
 
-interface MobileMenuItemProps {
-  menu: MenuData;
-  index: number;
-  isActive: boolean;
-  onToggle: (index: number) => void;
-  onItemClick: (label: string) => void;
+.menu-item.active {
+  background: #f8f9fa;
 }
 
-// Subcomponents
-const MenuLink: React.FC<MenuLinkProps> = React.memo(
-  ({ item, onHover, onLeave, onClick }) => (
-    <a
-      href="#"
-      className="menu-link"
-      onMouseEnter={() => onHover(item.label)}
-      onMouseLeave={onLeave}
-      onClick={(e) => {
-        e.preventDefault();
-        onClick(item.label);
-      }}
-      role="menuitem"
-    >
-      <i className={item.icon} aria-hidden="true" />
-      <span>{item.label}</span>
-    </a>
-  )
-);
+.megamenu-panel {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
 
-MenuLink.displayName = "MenuLink";
+.megamenu-panel.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  z-index: 1001;
+}
 
-const MegaMenuPanel: React.FC<MegaMenuPanelProps> = React.memo(
-  ({
-    menu,
-    isActive,
-    onMouseEnter,
-    onMouseLeave,
-    hoveredItem,
-    onItemHover,
-    onItemLeave,
-  }) => (
-    <div
-      className={`megamenu-panel ${isActive ? "show" : ""}`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      role="menu"
-      aria-label={`${menu.label} menu`}
-    >
-      <div className="p-5">
-        <div className="grid">
-          {menu.items.map((category, catIndex) => (
-            <section key={catIndex} className="col-12 md:col-6 lg:col-4">
-              {category.category && (
-                <h3 className="category-title">{category.category}</h3>
-              )}
-              <nav className="flex flex-column gap-1" role="none">
-                {category.items.map((item, itemIndex) => (
-                  <MenuLink
-                    key={itemIndex}
-                    item={item}
-                    onHover={onItemHover}
-                    onLeave={onItemLeave}
-                    onClick={(label) => console.log("Clicked:", label)}
-                  />
-                ))}
-              </nav>
-            </section>
-          ))}
-        </div>
-        <Divider />
-        <div className="item-description" role="status" aria-live="polite">
-          {hoveredItem || "Hover over an item to see its description"}
-        </div>
-      </div>
-    </div>
-  )
-);
+.category-title {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  padding-bottom: 0.5rem;
+  font-weight: 600;
+}
 
-MegaMenuPanel.displayName = "MegaMenuPanel";
+.menu-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
 
-const MobileMenuItem: React.FC<MobileMenuItemProps> = React.memo(
-  ({ menu, index, isActive, onToggle, onItemClick }) => (
-    <article className="mobile-menu-item">
-      <button
-        className="mobile-menu-header"
-        onClick={() => onToggle(index)}
-        aria-expanded={isActive}
-        aria-controls={`mobile-menu-content-${index}`}
-      >
-        <div className="flex align-items-center gap-2">
-          <i className={menu.icon} aria-hidden="true" />
-          <span className="font-semibold">{menu.label}</span>
-        </div>
-        <i
-          className={`pi ${isActive ? "pi-angle-up" : "pi-angle-down"}`}
-          aria-hidden="true"
-        />
-      </button>
-      <div
-        id={`mobile-menu-content-${index}`}
-        className={`mobile-menu-content ${isActive ? "open" : ""}`}
-        role="region"
-        aria-labelledby={`mobile-menu-header-${index}`}
-      >
-        {menu.items.map((category, catIndex) => (
-          <div key={catIndex} className="mobile-category">
-            {category.category && (
-              <h4 className="mobile-category-title">{category.category}</h4>
-            )}
-            {category.items.map((item, itemIndex) => (
-              <a
-                key={itemIndex}
-                href="#"
-                className="menu-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onItemClick(item.label);
-                }}
-                role="menuitem"
-              >
-                <i className={item.icon} aria-hidden="true" />
-                <span>{item.label}</span>
-              </a>
-            ))}
-          </div>
-        ))}
-      </div>
-    </article>
-  )
-);
+.menu-link:hover {
+  background: #f1f5f9;
+  color: #3b82f6;
+  text-decoration: none;
+}
 
-MobileMenuItem.displayName = "MobileMenuItem";
+.menu-link i {
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+}
 
-// Main Component
-const CustomMegaMenu: React.FC = () => {
-  const [activeMenu, setActiveMenu] = useState<number | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+.item-description {
+  color: #64748b;
+  font-size: 0.95rem;
+  min-height: 24px;
+  transition: opacity 0.15s ease;
+}
 
-  const handleItemHover = useCallback((label: string) => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    setHoveredItem(label);
-  }, []);
+.hamburger-btn {
+  display: none;
+}
 
-  const handleItemLeave = useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    hoverTimeoutRef.current = setTimeout(() => {
-      setHoveredItem(null);
-    }, HOVER_DELAY_MS);
-  }, []);
+.mobile-menu {
+  display: none;
+}
 
-  const handleMenuLeave = useCallback(() => {
-    setActiveMenu(null);
-    setHoveredItem(null);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-  }, []);
+.mobile-menu-header {
+  width: 100%;
+  text-align: left;
+  background: white;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  const toggleMobileMenu = useCallback((index: number) => {
-    setActiveMenu((prev) => (prev === index ? null : index));
-  }, []);
+.mobile-menu-header:active {
+  background: #f8f9fa;
+}
 
-  const handleMobileItemClick = useCallback((label: string) => {
-    console.log("Clicked:", label);
-    setMobileMenuOpen(false);
-  }, []);
+/* Mobile Styles */
+@media screen and (max-width: 768px) {
+  .hamburger-btn {
+    display: block !important;
+  }
 
-  const handleHamburgerClick = useCallback(() => {
-    setMobileMenuOpen((prev) => !prev);
-  }, []);
+  .desktop-menu {
+    display: none !important;
+  }
 
-  // Memoized menu data to prevent unnecessary re-renders
-  const menuData = useMemo(() => MENU_DATA, []);
+  .mobile-menu {
+    display: block;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    z-index: 1000;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <header>
-        <nav className="custom-megamenu" role="navigation" aria-label="Main navigation">
-          <div className="flex align-items-center justify-content-between px-4">
-            {/* Desktop Menu */}
-            <ul className="desktop-menu" onMouseLeave={handleMenuLeave} role="menubar">
-              {menuData.map((menu, index) => (
-                <li key={index} className="menu-container" role="none">
-                  <button
-                    className={`menu-item ${activeMenu === index ? "active" : ""}`}
-                    onMouseEnter={() => setActiveMenu(index)}
-                    aria-haspopup="true"
-                    aria-expanded={activeMenu === index}
-                    role="menuitem"
-                  >
-                    <div className="flex align-items-center gap-2">
-                      <i className={menu.icon} aria-hidden="true" />
-                      <span className="font-semibold">{menu.label}</span>
-                      <i className="pi pi-angle-down text-sm" aria-hidden="true" />
-                    </div>
-                  </button>
+  .mobile-menu.open {
+    transform: translateX(0);
+  }
 
-                  <MegaMenuPanel
-                    menu={menu}
-                    isActive={activeMenu === index}
-                    onMouseEnter={() => setActiveMenu(index)}
-                    onMouseLeave={handleMenuLeave}
-                    hoveredItem={hoveredItem}
-                    onItemHover={handleItemHover}
-                    onItemLeave={handleItemLeave}
-                  />
-                </li>
-              ))}
-            </ul>
+  .mobile-menu-item {
+    border-bottom: 1px solid #e2e8f0;
+  }
 
-            {/* Mobile Hamburger */}
-            <Button
-              icon={mobileMenuOpen ? "pi pi-times" : "pi pi-bars"}
-              className="hamburger-btn"
-              text
-              onClick={handleHamburgerClick}
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
-            />
-          </div>
+  .mobile-menu-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #f8f9fa;
+  }
 
-          {/* Mobile Menu */}
-          <aside
-            id="mobile-menu"
-            className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}
-            aria-hidden={!mobileMenuOpen}
-          >
-            {menuData.map((menu, index) => (
-              <MobileMenuItem
-                key={index}
-                menu={menu}
-                index={index}
-                isActive={activeMenu === index}
-                onToggle={toggleMobileMenu}
-                onItemClick={handleMobileItemClick}
-              />
-            ))}
-          </aside>
-        </nav>
-      </header>
+  .mobile-menu-content.open {
+    max-height: 2000px;
+  }
 
-      <main className="p-4" style={{ marginTop: NAV_HEIGHT }}>
-        <article className="card p-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold mb-3">
-            Responsive Custom Mega Menu
-          </h1>
-          <p className="text-gray-600 mb-4">
-            Hover on desktop or tap on mobile to see the mega menu
-          </p>
-        </article>
-      </main>
-    </div>
-  );
-};
+  .mobile-category {
+    padding: 0.75rem 1rem;
+    background: white;
+    margin: 0.5rem 1rem;
+    border-radius: 6px;
+  }
 
-CustomMegaMenu.displayName = "CustomMegaMenu";
+  .mobile-category-title {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
 
-export default CustomMegaMenu;
+  .menu-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .menu-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablet Styles */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .menu-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Accessibility improvements */
+.menu-link:focus-visible,
+.menu-item:focus-visible,
+.mobile-menu-header:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Performance optimization */
+.megamenu-panel {
+  will-change: opacity, transform;
+}
+
+.mobile-menu {
+  will-change: transform;
+}
+
+/* Hide screen reader only text visually */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
