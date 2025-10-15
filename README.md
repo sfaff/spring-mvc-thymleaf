@@ -53,17 +53,15 @@ const MegaMenuComponent: React.FC = () => {
     return `/${slugify(category)}/${slugify(subcategory)}/${slugify(item)}`;
   };
 
-  // Helper function to add command to items
-  const addCommandToItems = (
-    category: string, 
-    subcategory: string, 
-    items: MenuItemWithLabel[]
-  ): MenuItem[] => {
+  // Helper function to add command to items with custom paths
+  const addCommandToItems = (items: (MenuItemWithLabel & { path?: string })[]): MenuItem[] => {
     return items.map(item => ({
       ...item,
       command: () => {
-        const path = createPath(category, subcategory, item.label);
-        navigate(path);
+        // Use custom path if provided, otherwise skip navigation
+        if (item.path) {
+          navigate(item.path);
+        }
       }
     }));
   };
@@ -76,52 +74,52 @@ const MegaMenuComponent: React.FC = () => {
         [
           {
             label: 'Living Room',
-            items: addCommandToItems('Furniture', 'Living Room', [
-              { label: 'Accessories' },
-              { label: 'Armchair' },
-              { label: 'Coffee Table' },
-              { label: 'Couch' },
-              { label: 'TV Stand' }
+            items: addCommandToItems([
+              { label: 'Accessories', path: '/furniture/living-room/accessories' },
+              { label: 'Armchair', path: '/furniture/living-room/armchair' },
+              { label: 'Coffee Table', path: '/furniture/living-room/coffee-table' },
+              { label: 'Couch', path: '/furniture/living-room/couch' },
+              { label: 'TV Stand', path: '/furniture/living-room/tv-stand' }
             ])
           }
         ],
         [
           {
             label: 'Kitchen',
-            items: addCommandToItems('Furniture', 'Kitchen', [
-              { label: 'Bar stool' },
-              { label: 'Chair' },
-              { label: 'Table' }
+            items: addCommandToItems([
+              { label: 'Bar stool', path: '/furniture/kitchen/bar-stool' },
+              { label: 'Chair', path: '/furniture/kitchen/chair' },
+              { label: 'Table', path: '/furniture/kitchen/table' }
             ])
           },
           {
             label: 'Bathroom',
-            items: addCommandToItems('Furniture', 'Bathroom', [
-              { label: 'Accessories' }
+            items: addCommandToItems([
+              { label: 'Accessories', path: '/furniture/bathroom/accessories' }
             ])
           }
         ],
         [
           {
             label: 'Bedroom',
-            items: addCommandToItems('Furniture', 'Bedroom', [
-              { label: 'Bed' },
-              { label: 'Chaise lounge' },
-              { label: 'Cupboard' },
-              { label: 'Dresser' },
-              { label: 'Wardrobe' }
+            items: addCommandToItems([
+              { label: 'Bed', path: '/furniture/bedroom/bed' },
+              { label: 'Chaise lounge', path: '/furniture/bedroom/chaise-lounge' },
+              { label: 'Cupboard', path: '/furniture/bedroom/cupboard' },
+              { label: 'Dresser', path: '/furniture/bedroom/dresser' },
+              { label: 'Wardrobe', path: '/furniture/bedroom/wardrobe' }
             ])
           }
         ],
         [
           {
             label: 'Office',
-            items: addCommandToItems('Furniture', 'Office', [
-              { label: 'Bookcase' },
-              { label: 'Cabinet' },
-              { label: 'Chair' },
-              { label: 'Desk' },
-              { label: 'Executive Chair' }
+            items: addCommandToItems([
+              { label: 'Bookcase', path: '/furniture/office/bookcase' },
+              { label: 'Cabinet', path: '/furniture/office/cabinet' },
+              { label: 'Chair', path: '/furniture/office/chair' },
+              { label: 'Desk', path: '/furniture/office/desk' },
+              { label: 'Executive Chair', path: '/furniture/office/executive-chair' }
             ])
           }
         ]
@@ -134,46 +132,46 @@ const MegaMenuComponent: React.FC = () => {
         [
           {
             label: 'Computer',
-            items: addCommandToItems('Electronics', 'Computer', [
-              { label: 'Monitor' },
-              { label: 'Mouse' },
-              { label: 'Notebook' },
-              { label: 'Keyboard' },
-              { label: 'Printer' },
-              { label: 'Storage' }
+            items: addCommandToItems([
+              { label: 'Monitor', path: '/electronics/computer/monitor' },
+              { label: 'Mouse', path: '/electronics/computer/mouse' },
+              { label: 'Notebook', path: '/electronics/computer/notebook' },
+              { label: 'Keyboard', path: '/electronics/computer/keyboard' },
+              { label: 'Printer', path: '/electronics/computer/printer' },
+              { label: 'Storage', path: '/electronics/computer/storage' }
             ])
           }
         ],
         [
           {
             label: 'Home Theather',
-            items: addCommandToItems('Electronics', 'Home Theather', [
-              { label: 'Projector' },
-              { label: 'Speakers' },
-              { label: 'TVs' }
+            items: addCommandToItems([
+              { label: 'Projector', path: '/electronics/home-theather/projector' },
+              { label: 'Speakers', path: '/electronics/home-theather/speakers' },
+              { label: 'TVs', path: '/electronics/home-theather/tvs' }
             ])
           }
         ],
         [
           {
             label: 'Gaming',
-            items: addCommandToItems('Electronics', 'Gaming', [
-              { label: 'Accessories' },
-              { label: 'Console' },
-              { label: 'PC' },
-              { label: 'Video Games' }
+            items: addCommandToItems([
+              { label: 'Accessories', path: '/electronics/gaming/accessories' },
+              { label: 'Console', path: '/electronics/gaming/console' },
+              { label: 'PC', path: '/electronics/gaming/pc' },
+              { label: 'Video Games', path: '/electronics/gaming/video-games' }
             ])
           }
         ],
         [
           {
             label: 'Appliances',
-            items: addCommandToItems('Electronics', 'Appliances', [
-              { label: 'Coffee Machine' },
-              { label: 'Fridge' },
-              { label: 'Oven' },
-              { label: 'Vaccum Cleaner' },
-              { label: 'Washing Machine' }
+            items: addCommandToItems([
+              { label: 'Coffee Machine', path: '/electronics/appliances/coffee-machine' },
+              { label: 'Fridge', path: '/electronics/appliances/fridge' },
+              { label: 'Oven', path: '/electronics/appliances/oven' },
+              { label: 'Vaccum Cleaner', path: '/electronics/appliances/vaccum-cleaner' },
+              { label: 'Washing Machine', path: '/electronics/appliances/washing-machine' }
             ])
           }
         ]
@@ -186,44 +184,44 @@ const MegaMenuComponent: React.FC = () => {
         [
           {
             label: 'Football',
-            items: addCommandToItems('Sports', 'Football', [
-              { label: 'Kits' },
-              { label: 'Shoes' },
-              { label: 'Shorts' },
-              { label: 'Training' }
+            items: addCommandToItems([
+              { label: 'Kits', path: '/sports/football/kits' },
+              { label: 'Shoes', path: '/sports/football/shoes' },
+              { label: 'Shorts', path: '/sports/football/shorts' },
+              { label: 'Training', path: '/sports/football/training' }
             ])
           }
         ],
         [
           {
             label: 'Running',
-            items: addCommandToItems('Sports', 'Running', [
-              { label: 'Accessories' },
-              { label: 'Shoes' },
-              { label: 'T-Shirts' },
-              { label: 'Shorts' }
+            items: addCommandToItems([
+              { label: 'Accessories', path: '/sports/running/accessories' },
+              { label: 'Shoes', path: '/sports/running/shoes' },
+              { label: 'T-Shirts', path: '/sports/running/t-shirts' },
+              { label: 'Shorts', path: '/sports/running/shorts' }
             ])
           }
         ],
         [
           {
             label: 'Swimming',
-            items: addCommandToItems('Sports', 'Swimming', [
-              { label: 'Kickboard' },
-              { label: 'Nose Clip' },
-              { label: 'Swimsuits' },
-              { label: 'Paddles' }
+            items: addCommandToItems([
+              { label: 'Kickboard', path: '/sports/swimming/kickboard' },
+              { label: 'Nose Clip', path: '/sports/swimming/nose-clip' },
+              { label: 'Swimsuits', path: '/sports/swimming/swimsuits' },
+              { label: 'Paddles', path: '/sports/swimming/paddles' }
             ])
           }
         ],
         [
           {
             label: 'Tennis',
-            items: addCommandToItems('Sports', 'Tennis', [
-              { label: 'Balls' },
-              { label: 'Rackets' },
-              { label: 'Shoes' },
-              { label: 'Training' }
+            items: addCommandToItems([
+              { label: 'Balls', path: '/sports/tennis/balls' },
+              { label: 'Rackets', path: '/sports/tennis/rackets' },
+              { label: 'Shoes', path: '/sports/tennis/shoes' },
+              { label: 'Training', path: '/sports/tennis/training' }
             ])
           }
         ]
